@@ -19,6 +19,11 @@ class ViewController: UIViewController {
     var num2 = 0.0
     var dot : Bool = false //是否已經輸入過小數點
     
+    //狀態控制
+    var num1hasInput : Bool = false
+    var num2nowInput : Bool = false
+    var equClicked : Bool = false
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,22 +35,67 @@ class ViewController: UIViewController {
     // operotor button click
     // connect to + - * /
     @IBAction func opBclick(_ sender: UIButton) {
+        if(num1hasInput == false && num2nowInput == false)
+        {
+            num1hasInput = true
+    //try
+            num1 = Double(outL.text!)!
+            dot = false
+        }
+        else if(num1hasInput == true && num2nowInput == true)
+        {
+            num2nowInput = false
+    //try
+            num2 = Double(outL.text!)!
+            
+            switch op {
+            case "+":
+                ans = num1 + num2
+            case "-":
+                ans = num1 - num2
+            case "×":
+                ans = num1 * num2
+            case "÷":
+                ans = num1 / num2
+            default:
+                break
+            }
+
+            //dot = false
+            num1 = ans
+            outL.text = String(num1)
+        }
         op = sender.currentTitle!
         opL.text = op
-    //try
-        num1 = Double(outL.text!)!
-        outL.text = "0"
-        dot = false
+        
     }
     
     // number button click
     // connect to 1234567890
     @IBAction func numBclick(_ sender: UIButton) {
-        if(outL.text == "0")
+        if(num1hasInput == false && num2nowInput == false)
         {
-            outL.text = ""
+            if(outL.text == "0")
+            {
+                outL.text = ""
+            }
+            outL.text?.append(sender.currentTitle!)
         }
-        outL.text?.append(sender.currentTitle!)
+        else if(num1hasInput == true && num2nowInput == false)
+        {
+
+            num2nowInput = true
+            outL.text = sender.currentTitle!
+        }
+        else if(num1hasInput == true && num2nowInput == true)
+        {
+            if(outL.text == "0")
+            {
+                outL.text = ""
+            }
+            outL.text?.append(sender.currentTitle!)
+        }
+        
     }
     
     // dot button click
@@ -58,7 +108,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func equBclick(_ sender: UIButton) {
-        
+        equClicked = true
     //try
         num2 = Double(outL.text!)!
        
@@ -77,8 +127,11 @@ class ViewController: UIViewController {
         
         opL.text = ""
         op = ""
-        dot = false
+        //dot = false
         outL.text = String(ans)
+        num1 = ans
+        num1hasInput = true
+        num2nowInput = false
     }
     
     @IBAction func rootBclick(_ sender: Any) {
@@ -86,7 +139,7 @@ class ViewController: UIViewController {
         ans = pow(ans, 0.5)
         outL.text = String(ans)
     }
-        
+    
     @IBAction func signBclick(_ sender: UIButton) {
         if(outL.text!.hasPrefix("-"))
         {
@@ -102,20 +155,25 @@ class ViewController: UIViewController {
     
     @IBAction func PercentageBclick(_ sender: UIButton) {
 
+        //
+        
     }
     
     @IBAction func clearBclick(_ sender: UIButton) {
         ans = 0.0
-        op = ""
         num1 = 0.0
         num2 = 0.0
-        dot = false
         outL.text = "0"
+        op = ""
         opL.text = ""
+        dot = false
+        equClicked = false
+        num1hasInput = false
+        num2nowInput = false
     }
     
     @IBAction func delBclick(_ sender: UIButton) {
-        if(outL.text!.count==1)
+        if(outL.text!.count == 1)
         {
             outL.text = "0"
         }
@@ -123,6 +181,10 @@ class ViewController: UIViewController {
         {
             let str = outL.text!
             let index = str.index(str.endIndex, offsetBy: -1)
+            if(str.hasSuffix("."))
+            {
+                dot = false
+            }
             outL.text = String(str[..<index])
         }
     }
