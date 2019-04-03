@@ -15,14 +15,9 @@ class ViewController: UIViewController {
     
     var ans = 0.0
     var op : String = ""
-    var num1 = 0.0
-    var num2 = 0.0
-    var dot : Bool = false //是否已經輸入過小數點
-    
-    //狀態控制
-    var num1hasInput : Bool = false
-    var num2nowInput : Bool = false
-    var equClicked : Bool = false
+    var num1 : Double? = nil
+    var num2 : Double? = nil
+    var prevKey : Int = 0 //紀錄上一個按下的按鍵類型。 0:等號。1:數字。2:加減乘除。
     
     
     override func viewDidLoad() {
@@ -35,103 +30,151 @@ class ViewController: UIViewController {
     // operotor button click
     // connect to + - * /
     @IBAction func opBclick(_ sender: UIButton) {
-        if(num1hasInput == false && num2nowInput == false)
-        {
-            num1hasInput = true
-    //try
-            num1 = Double(outL.text!)!
-            dot = false
+        if (prevKey == 0) 
+        { //0:等號。
+            ans = Double(outL.text!)!
+            num1 = ans
+            prevKey = 2
         }
-        else if(num1hasInput == true && num2nowInput == true)
-        {
-            num2nowInput = false
-    //try
-            num2 = Double(outL.text!)!
-            
-            switch op {
-            case "+":
-                ans = num1 + num2
-            case "-":
-                ans = num1 - num2
-            case "×":
-                ans = num1 * num2
-            case "÷":
-                ans = num1 / num2
-            default:
-                break
+        else if (prevKey == 1) 
+        {//1:數字。
+            if(num1 == nil)
+            {
+                num1 = Double(outL.text!)!
+            }
+            else if(num1 != nil && num2 == nil)
+            {
+                num2 = Double(outL.text!)!            
+                switch op {
+                case "+":
+                    ans = num1! + num2!
+                case "-":
+                    ans = num1! - num2!
+                case "×":
+                    ans = num1! * num2!
+                case "÷":
+                    ans = num1! / num2!
+                default:
+                    break
+                }
+                outL.text = String(ans)
+            }
+            else if(num1 != nil && num2 != nil)
+            {
+                num1 = ans
+                num2 = Double(outL.text!)!            
+                switch op {
+                case "+":
+                    ans = num1! + num2!
+                case "-":
+                    ans = num1! - num2!
+                case "×":
+                    ans = num1! * num2!
+                case "÷":
+                    ans = num1! / num2!
+                default:
+                    break
+                }
+                outL.text = String(ans)
             }
 
-            //dot = false
-            num1 = ans
-            outL.text = String(num1)
+            prevKey = 2
+        }
+        else if (prevKey == 2) 
+        {//2:加減乘除。
+
         }
         op = sender.currentTitle!
         opL.text = op
-        
     }
     
     // number button click
     // connect to 1234567890
     @IBAction func numBclick(_ sender: UIButton) {
-        if(num1hasInput == false && num2nowInput == false)
-        {
-            if(outL.text == "0")
-            {
-                outL.text = ""
-            }
-            outL.text?.append(sender.currentTitle!)
-        }
-        else if(num1hasInput == true && num2nowInput == false)
-        {
-
-            num2nowInput = true
+        if (prevKey == 0) { //0:等號。
+            clearBclick(sender)
             outL.text = sender.currentTitle!
+            prevKey = 1
         }
-        else if(num1hasInput == true && num2nowInput == true)
-        {
-            if(outL.text == "0")
-            {
-                outL.text = ""
-            }
+        else if (prevKey == 1) {//1:數字。
             outL.text?.append(sender.currentTitle!)
+            prevKey = 1
         }
-        
+        else if (prevKey == 2) {//2:加減乘除。
+            outL.text = sender.currentTitle!
+            prevKey = 1
+        }        
     }
     
     // dot button click
     // connect to .
     @IBAction func dotBclick(_ sender: UIButton) {
-        if dot == false {
-            dot = true
+        if outL.text?.contains(".") == false
+        {
             outL.text?.append(sender.currentTitle!)
         }
+        prevKey = 1
     }
     
     @IBAction func equBclick(_ sender: UIButton) {
-        equClicked = true
-    //try
-        num2 = Double(outL.text!)!
-       
-        switch op {
-        case "+":
-            ans = num1 + num2
-        case "-":
-            ans = num1 - num2
-        case "×":
-            ans = num1 * num2
-        case "÷":
-            ans = num1 / num2
-        default:
-            break
+        if (prevKey == 0) 
+        { //0:等號。
+            num1 = Double(outL.text!)!
+            ans = num1!
         }
-        
+        else if (prevKey == 1) 
+        {//1:數字。
+
+            if(num1 == nil)
+            {
+                num1 = Double(outL.text!)!
+                ans = num1!
+                outL.text = String(ans)
+            }
+            else if(num1 != nil && num2 == nil)
+            {
+                num2 = Double(outL.text!)!
+                switch op 
+                {
+                case "+":
+                    ans = num1! + num2!
+                case "-":
+                    ans = num1! - num2!
+                case "×":
+                    ans = num1! * num2!
+                case "÷":
+                    ans = num1! / num2!
+                default:
+                    break
+                }
+            }
+            else if(num1 != nil && num2 != nil)
+            {
+                num1 = ans
+                num2 = Double(outL.text!)!
+                switch op {
+                case "+":
+                    ans = num1! + num2!
+                case "-":
+                    ans = num1! - num2!
+                case "×":
+                    ans = num1! * num2!
+                case "÷":
+                    ans = num1! / num2!
+                default:
+                    break
+                }
+            }
+
+            prevKey = 0
+        }
+        else if (prevKey == 2) 
+        {//2:加減乘除。
+            //不動聲色
+        }
         opL.text = ""
         op = ""
-        //dot = false
         outL.text = String(ans)
-        num1 = ans
-        num1hasInput = true
-        num2nowInput = false
     }
     
     @IBAction func rootBclick(_ sender: Any) {
@@ -151,25 +194,23 @@ class ViewController: UIViewController {
         {
             outL.text = "-" + outL.text!
         }
+        ans = Double(outL.text!)!
     }
     
     @IBAction func PercentageBclick(_ sender: UIButton) {
 
         //
-        
+
     }
     
     @IBAction func clearBclick(_ sender: UIButton) {
         ans = 0.0
-        num1 = 0.0
-        num2 = 0.0
+        num1 = nil
+        num2 = nil
         outL.text = "0"
         op = ""
         opL.text = ""
-        dot = false
-        equClicked = false
-        num1hasInput = false
-        num2nowInput = false
+        prevKey = 0
     }
     
     @IBAction func delBclick(_ sender: UIButton) {
@@ -181,10 +222,6 @@ class ViewController: UIViewController {
         {
             let str = outL.text!
             let index = str.index(str.endIndex, offsetBy: -1)
-            if(str.hasSuffix("."))
-            {
-                dot = false
-            }
             outL.text = String(str[..<index])
         }
     }
