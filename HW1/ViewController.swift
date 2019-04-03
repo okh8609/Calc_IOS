@@ -32,7 +32,7 @@ class ViewController: UIViewController {
     @IBAction func opBclick(_ sender: UIButton) {
         if (prevKey == 0) 
         { //0:等號。
-            num1 = ans
+            num1 = Double(outL.text!)!
             num2 = nil
             prevKey = 2
         }
@@ -97,7 +97,14 @@ class ViewController: UIViewController {
             prevKey = 1
         }
         else if (prevKey == 1) {//1:數字。
-            outL.text?.append(sender.currentTitle!)
+            if(outL.text == "0")
+            {
+                outL.text = sender.currentTitle!
+            }
+            else
+            {
+                outL.text?.append(sender.currentTitle!)
+            }
             prevKey = 1
         }
         else if (prevKey == 2) {//2:加減乘除。
@@ -112,13 +119,13 @@ class ViewController: UIViewController {
         if outL.text?.contains(".") == false
         {
             outL.text?.append(sender.currentTitle!)
+            prevKey = 1
         }
-        prevKey = 1
     }
     
     @IBAction func equBclick(_ sender: UIButton) {
         if (prevKey == 0 || prevKey == 1)
-        {//1:數字。
+        {//0:等號。1:數字。
             if(num1 == nil && num2 == nil)
             {
                 num1 = Double(outL.text!)!
@@ -175,9 +182,12 @@ class ViewController: UIViewController {
     }
     
     @IBAction func rootBclick(_ sender: Any) {
-        var ans = Double(outL.text!)!
-        ans = pow(ans, 0.5)
+        let result = Double(outL.text!)!
+        ans = pow(result, 0.5)
+        num1 = ans
+        num2 = nil
         outL.text = String(ans)
+        prevKey = 0
     }
     
     @IBAction func signBclick(_ sender: UIButton) {
@@ -195,7 +205,66 @@ class ViewController: UIViewController {
     }
     
     @IBAction func PercentageBclick(_ sender: UIButton) {
-
+        if (prevKey == 0)
+        { //0:等號。
+            //無效輸入 直接清除
+            clearBclick(sender)
+        }
+        else if (prevKey == 1)
+        {//1:數字。
+            if(num1 == nil && num2 == nil)
+            {
+                //無效輸入 直接清除
+                clearBclick(sender)
+            }
+            else if(num1 != nil && num2 == nil)
+            {
+                num2 = Double(outL.text!)!
+                let num2p = num1! * num2! / 100
+                switch op
+                {
+                case "+":
+                    ans = num1! + num2p
+                case "-":
+                    ans = num1! - num2p
+                case "×":
+                    ans = num1! * num2! / 100
+                case "÷":
+                    ans = num1! / num2! * 100
+                default:
+                    break
+                }
+                outL.text = String(ans)
+            }
+            else if(num1 != nil && num2 != nil)
+            {
+                num1 = ans
+                num2 = Double(outL.text!)!
+                let num2p = num1! * num2! / 100
+                switch op {
+                case "+":
+                    ans = num1! + num2p
+                case "-":
+                    ans = num1! - num2p
+                case "×":
+                    ans = num1! * num2! / 100
+                case "÷":
+                    ans = num1! / num2! * 100
+                default:
+                    break
+                }
+                outL.text = String(ans)
+            }
+            
+            prevKey = 0
+        }
+        else if (prevKey == 2)
+        {//2:加減乘除。
+            //無效輸入 直接清除
+            clearBclick(sender)
+        }
+        opL.text = ""
+        op = ""
     }
     
     @IBAction func clearBclick(_ sender: UIButton) {
@@ -209,7 +278,10 @@ class ViewController: UIViewController {
     }
     
     @IBAction func delBclick(_ sender: UIButton) {
-        if(outL.text!.count == 1)
+        if (prevKey == 0) { //0:等號。
+            clearBclick(sender)
+        }
+        else if(outL.text!.count == 1)
         {
             outL.text = "0"
         }
@@ -219,6 +291,7 @@ class ViewController: UIViewController {
             let index = str.index(str.endIndex, offsetBy: -1)
             outL.text = String(str[..<index])
         }
+        
     }
 }
 
