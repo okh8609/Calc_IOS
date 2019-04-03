@@ -32,13 +32,13 @@ class ViewController: UIViewController {
     @IBAction func opBclick(_ sender: UIButton) {
         if (prevKey == 0) 
         { //0:等號。
-            ans = Double(outL.text!)!
             num1 = ans
+            num2 = nil
             prevKey = 2
         }
         else if (prevKey == 1) 
         {//1:數字。
-            if(num1 == nil)
+            if(num1 == nil && num2 == nil)
             {
                 num1 = Double(outL.text!)!
             }
@@ -117,18 +117,13 @@ class ViewController: UIViewController {
     }
     
     @IBAction func equBclick(_ sender: UIButton) {
-        if (prevKey == 0) 
-        { //0:等號。
-            num1 = Double(outL.text!)!
-            ans = num1!
-        }
-        else if (prevKey == 1) 
+        if (prevKey == 0 || prevKey == 1)
         {//1:數字。
-
-            if(num1 == nil)
+            if(num1 == nil && num2 == nil)
             {
                 num1 = Double(outL.text!)!
                 ans = num1!
+                //num2 = nil
                 outL.text = String(ans)
             }
             else if(num1 != nil && num2 == nil)
@@ -147,6 +142,7 @@ class ViewController: UIViewController {
                 default:
                     break
                 }
+                outL.text = String(ans)
             }
             else if(num1 != nil && num2 != nil)
             {
@@ -164,17 +160,18 @@ class ViewController: UIViewController {
                 default:
                     break
                 }
+                outL.text = String(ans)
             }
 
             prevKey = 0
         }
         else if (prevKey == 2) 
         {//2:加減乘除。
-            //不動聲色
+            //無效輸入 直接清除
+            clearBclick(sender)
         }
         opL.text = ""
         op = ""
-        outL.text = String(ans)
     }
     
     @IBAction func rootBclick(_ sender: Any) {
@@ -198,8 +195,6 @@ class ViewController: UIViewController {
     }
     
     @IBAction func PercentageBclick(_ sender: UIButton) {
-
-        //
 
     }
     
